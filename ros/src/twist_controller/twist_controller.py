@@ -1,14 +1,72 @@
+from pid import PID
+from lowpass import LowPassFilter
+from yaw_controller import YawController
+import rospy
 
 GAS_DENSITY = 2.858
 ONE_MPH = 0.44704
 
 
 class Controller(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, vehicle_mass, fuel_capacity, brake_deadband, decel_limit, accel_limit, wheel_radius,
+                 wheel_base, steer_ratio, max_lateral_accel, max_steer_angle):
         # TODO: Implement
+        self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lateral_accel, max_steer_angle)
+        kp = 0.3
+        ki = 0.1
+        kd = 0.0
+        mn = 0.0 # min_throttle
+        mx = 0.2 # max_throttle
+        self.throttle_controller = PID(kp,ki,kd,mn,mx)
+
+        tau = 0.5 # cutoff_freq => 1/(2*pi*tau)
+        ts = 0.02 # sample_time -> 50 Hz
+        self.velocity_lpf = LowPassFilter(tau,ts)
+
+        self.wheel_base = wheel_base
+        self.decel_limit = decel_limit
+        self.accel_limit = accel_limit
+        self.steer_ratio = steer_ratio
+        self.vehicle_mass = vehicle_mass
+        self.wheel_radius = wheel_radius 
+        self.fuel_capacity = fuel_capacity
+        self.brake_deadband = brake_deadband
+        self.max_steer_angle = max_steer_angle
+        self.max_lateral_accel = max_lateral_accel
+
+    
+        self.last_vel = 0
+        self.last_time = rospy.get_time()
+
         pass
 
-    def control(self, *args, **kwargs):
+    def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
         # TODO: Change the arg, kwarg list to suit your needs
+        if not dbw_enabled : 
+            self.throttle_controller.reset()
+            return 0.0 , 0.0 , 0.0
+
+        current_vel = self.velocity_lpf.filt(current_vel)
+
+        steering = self.yaw_controller.get_steering(linear_vel,angular_vel,current_vel)
+
+        vel_error = linear_vel - current_vel
+        self.last_vel = current_vel
+
+        current_time = rospy.get_time()
+        sample_time = current_time - self.last_time
+        self.last_time = current_time
+
+        throttle = self.throttle_controller.step(vel_error,sample_time)
+        brake = 0  
+
+        if linear_vel == 0 and current_vel < 0.1 :
+            throttle = 0
+            brake = 400 # Nm => accel = -1 m/sec2
+        elif throttle < 0.1 and vel_error < 0 :
+            decel = max(vel_error, max_decel)
+            brake = abs(decel) * self.vehicle_mass * self.wheel_radius # torque => Nm
+
         # Return throttle, brake, steer
-        return 1., 0., 0.
+        #return 1., 0., 0.
+        return throttle, brake, steering
