@@ -64,7 +64,8 @@ class Controller(object):
             throttle = 0
             brake = 400 # Nm => accel = -1 m/sec2
         elif throttle < 0.1 and vel_error < 0 :
-            decel = max(vel_error, max_decel)
+            #decel = max(vel_error, max_decel)
+            decel = max(vel_error, self.decel_limit)
             brake = abs(decel) * self.vehicle_mass * self.wheel_radius # torque => Nm
 
         # Return throttle, brake, steer
