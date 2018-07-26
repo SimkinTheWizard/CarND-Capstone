@@ -24,7 +24,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-
+MAX_DECEL = .3
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -40,6 +40,7 @@ class WaypointUpdater(object):
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
+        
         self.pose = None
         self.waypoints_2d = None
         self.waypoint_tree = None
@@ -112,6 +113,7 @@ class WaypointUpdater(object):
         #pass
         self.stopline_wp_idx = msg.data
 
+
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
         pass
@@ -136,10 +138,9 @@ class WaypointUpdater(object):
         farthest_idx = closest_idx + LOOKAHEAD_WPS
         base_waypoints = self.base_lane.waypoints[closest_idx:farthest_idx]
 
-        if self.stopline_wp_idx == -1 or self.stopline_wp_idx >=farthest_idx :
+        if (self.stopline_wp_idx == -1) or self.stopline_wp_idx >=farthest_idx :
             lane.waypoints = base_waypoints
         else :
-            rospy.logwarn('red light => stopping')
             lane.waypoints = self.decelerate_waypoints(base_waypoints,closest_idx)
         
         return lane
@@ -152,10 +153,10 @@ class WaypointUpdater(object):
             stop_idx = min(self.stopline_wp_idx-closest_idx -2,0)
             dist = self.distance(waypoints,i,stop_idx)
 
-            vel = math.sqrt(2*MAX_DECELi*dist) # todo: experiment with linear and derivative-functions
+            vel = math.sqrt(2*MAX_DECEL*dist) # todo: experiment with linear and derivative-functions
             if vel < 1.0:
                 vel = 0.0
-            p.twist.twist.linear.x = min(vel, twist.twist.linear.x)
+            p.twist.twist.linear.x = min(vel, p.twist.twist.linear.x)
             temp.append(p)
         return temp
 

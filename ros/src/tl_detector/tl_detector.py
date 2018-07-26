@@ -77,7 +77,7 @@ class TLDetector(object):
         self.has_image = True
         self.camera_image = msg
         light_wp, state = self.process_traffic_lights()
-        
+                    
         '''
         Publish upcoming red lights at camera frequency.
         Each predicted state has to occur `STATE_COUNT_THRESHOLD` number
@@ -92,6 +92,7 @@ class TLDetector(object):
             light_wp = light_wp if state == TrafficLight.RED else -1
             self.last_wp = light_wp
             self.upcoming_red_light_pub.publish(Int32(light_wp))
+
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
@@ -121,6 +122,7 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
+        return light.state
         if(not self.has_image):
             self.prev_light_loc = None
             return False
@@ -154,15 +156,17 @@ class TLDetector(object):
                 d = temp_wp_index - car_wp_index
                 if d >= 0 and d < diff:
                     diff = d
-                    closes_light = light
+                    closest_light = light
                     line_wp_index = temp_wp_index 
+
             #car_position = self.get_closest_waypoint(self.pose.pose)
 
         #TODO find the closest visible traffic light (if one exists)
 
         if closest_light:
             state = self.get_light_state(closest_light)
-            return light_wp, state
+            return line_wp_index, state
+            
         
         return -1, TrafficLight.UNKNOWN
 
