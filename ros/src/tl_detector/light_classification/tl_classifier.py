@@ -51,7 +51,7 @@ class TLClassifier(object):
       
         #TODO implement light color prediction
 
-        with self.graph.as_default():
+        with self.detection_graph.as_default():
             with tf.Session() as sess:
                 ops = tf.get_default_graph().get_operations()
                 all_tensor_names = {output.name for op in ops for output in op.outputs}
