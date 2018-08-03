@@ -2,6 +2,8 @@ from styx_msgs.msg import TrafficLight
 import tensorflow as tf
 import numpy as np
 import os, rospkg
+import rospy
+import cv2
 
 class TLClassifier(object):
     def __init__(self, is_site):
@@ -14,6 +16,7 @@ class TLClassifier(object):
             config = 'real'   
         rospack = rospkg.RosPack()
         PATH_TO_CKPT = os.path.join(rospack.get_path("tl_detector"), "light_classification/trained", config ,"frozen/frozen_inference_graph.pb") 
+        #PATH_TO_CKPT = os.path.join(rospack.get_path("tl_detector"), "light_classification/trained", config ,"frozen/optimized_graph.pb") 
         PATH_TO_LABELS = os.path.join(rospack.get_path("tl_detector"), "light_classification/trained/object-detection.pbtxt") 
 
         NUM_CLASSES = 4
@@ -29,7 +32,7 @@ class TLClassifier(object):
         #label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
         #categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
         #category_index = label_map_util.create_category_index(categories)
-        
+        self.sess = tf.Session(graph=self.detection_graph)
         pass
 
     # helper function from - TF object detection API
@@ -39,28 +42,33 @@ class TLClassifier(object):
             (im_height, im_width, 3)).astype(np.uint8)
 
     def get_classification(self, image):
-        """Determines the color of the traffic light in the image
+            """Determines the color of the traffic light in the image
+    
+            Args:
+                image (cv::Mat): image containing the traffic light
 
-        Args:
-            image (cv::Mat): image containing the traffic light
+            Returns:
+                int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
-        Returns:
-            int: ID of traffic light color (specified in styx_msgs/TrafficLight)
-
-        """
+            """
       
-        #TODO implement light color prediction
-
-        with self.detection_graph.as_default():
-            with tf.Session() as sess:
-                ops = tf.get_default_graph().get_operations()
+            #TODO implement light color prediction
+            cv2.imshow('light', image)
+            cv2.waitKey(1)
+            #with self.detection_graph.as_default():
+            #with self.sess as sess:
+            sess = self.sess
+            if True:
+                ops = self.detection_graph.get_operations()
+                #ops = tf.get_default_graph().get_operations()
                 all_tensor_names = {output.name for op in ops for output in op.outputs}
 
                 tensor_dict = {}
                 for key in ['num_detections', 'detection_boxes', 'detection_scores','detection_classes', 'detection_masks']:
                     tensor_name = key + ':0'
                     if tensor_name in all_tensor_names:
-                        tensor_dict[key] = tf.get_default_graph().get_tensor_by_name(tensor_name)
+                        #tensor_dict[key] = tf.get_default_graph().get_tensor_by_name(tensor_name)
+                        tensor_dict[key] = self.detection_graph.get_tensor_by_name(tensor_name)
                 if 'detection_masks' in tensor_dict:
                     # The following processing is only for single image
                     detection_boxes = tf.squeeze(tensor_dict['detection_boxes'], [0])
@@ -75,7 +83,7 @@ class TLClassifier(object):
                     # Follow the convention by adding back the batch dimension
                     tensor_dict['detection_masks'] = tf.expand_dims(detection_masks_reframed, 0)
 
-                image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')
+                image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
 
                 # Run inference
                 output_dict = sess.run(tensor_dict,
@@ -91,16 +99,21 @@ class TLClassifier(object):
 
                 detected_class = output_dict['detection_classes'][0]
                 detection_acc  = output_dict['detection_scores'][0]
+                #rospy.loginfo('detection accuracy: '+ str(detection_acc))
                 if detection_acc < 0.95:
                     return TrafficLight.UNKNOWN
                 else:
                     if detected_class == 1:
+                        rospy.loginfo('detection GREEN: '+ str(detection_acc))
                         return TrafficLight.GREEN
                     if detected_class == 2:
+                        rospy.loginfo('detection RED: '+ str(detection_acc))
                         return TrafficLight.RED
                     if detected_class == 3:
+                        rospy.loginfo('detection YELLOW: '+ str(detection_acc))
                         return TrafficLight.YELLOW
                     if detected_class == 4:
+                        rospy.loginfo('detection UNKNOWN: '+ str(detection_acc))
                         return TrafficLight.UNKNOWN
-        return TrafficLight.UNKNOWN
+            return TrafficLight.UNKNOWN
 		
