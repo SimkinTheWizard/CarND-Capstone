@@ -75,32 +75,32 @@ class TLClassifier(object):
                     # Follow the convention by adding back the batch dimension
                     tensor_dict['detection_masks'] = tf.expand_dims(detection_masks_reframed, 0)
 
-                    image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')
+                image_tensor = tf.get_default_graph().get_tensor_by_name('image_tensor:0')
 
-                    # Run inference
-                    output_dict = sess.run(tensor_dict,
-                             feed_dict={image_tensor: np.expand_dims(image, 0)})
+                # Run inference
+                output_dict = sess.run(tensor_dict,
+                         feed_dict={image_tensor: np.expand_dims(image, 0)})
 
-                    # all outputs are float32 numpy arrays, so convert types as appropriate
-                    output_dict['num_detections'] = int(output_dict['num_detections'][0])
-                    output_dict['detection_classes'] = output_dict['detection_classes'][0].astype(np.uint8)
-                    output_dict['detection_boxes'] = output_dict['detection_boxes'][0]
-                    output_dict['detection_scores'] = output_dict['detection_scores'][0]
-                    if 'detection_masks' in output_dict:
-                        output_dict['detection_masks'] = output_dict['detection_masks'][0]
+                # all outputs are float32 numpy arrays, so convert types as appropriate
+                output_dict['num_detections'] = int(output_dict['num_detections'][0])
+                output_dict['detection_classes'] = output_dict['detection_classes'][0].astype(np.uint8)
+                output_dict['detection_boxes'] = output_dict['detection_boxes'][0]
+                output_dict['detection_scores'] = output_dict['detection_scores'][0]
+                if 'detection_masks' in output_dict:
+                    output_dict['detection_masks'] = output_dict['detection_masks'][0]
 
-                    detected_class = output_dict['detection_classes'][0]
-                    detection_acc  = output_dict['detection_scores'][0]
-                    if detection_acc < 0.95:
+                detected_class = output_dict['detection_classes'][0]
+                detection_acc  = output_dict['detection_scores'][0]
+                if detection_acc < 0.95:
+                    return TrafficLight.UNKNOWN
+                else:
+                    if detected_class == 1:
+                        return TrafficLight.GREEN
+                    if detected_class == 2:
+                        return TrafficLight.RED
+                    if detected_class == 3:
+                        return TrafficLight.YELLOW
+                    if detected_class == 4:
                         return TrafficLight.UNKNOWN
-                    else:
-                        if detected_class == 1:
-                            return TrafficLight.GREEN
-                        if detected_class == 2:
-                            return TrafficLight.RED
-                        if detected_class == 3:
-                            return TrafficLight.YELLOW
-                        if detected_class == 4:
-                            return TrafficLight.UNKNOWN
         return TrafficLight.UNKNOWN
 		

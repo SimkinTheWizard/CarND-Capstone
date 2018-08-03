@@ -136,7 +136,7 @@ class TLDetector(object):
 
         #Get classification
         state = self.light_classifier.get_classification(cv_image)
-        rospy.loginfo('Light state (object detection): '+ str(light.state))
+        rospy.loginfo('Light state (object detection): '+ str(state))
         return state
 
     def process_traffic_lights(self):
