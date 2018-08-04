@@ -53,8 +53,8 @@ class TLClassifier(object):
             """
       
             #TODO implement light color prediction
-            cv2.imshow('light', image)
-            cv2.waitKey(1)
+            #cv2.imshow('light', image)
+            #cv2.waitKey(1)
             #with self.detection_graph.as_default():
             #with self.sess as sess:
             sess = self.sess

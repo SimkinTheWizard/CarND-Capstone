@@ -138,7 +138,7 @@ class WaypointUpdater(object):
         closest_idx = self.get_closest_waypoint_idx()
         farthest_idx = closest_idx + LOOKAHEAD_WPS
         base_waypoints = self.base_lane.waypoints[closest_idx:farthest_idx]
-        #rospy.loginfo('generate_lane: '+ str(closest_idx))
+        rospy.loginfo('stop line: '+ str(self.stopline_wp_idx) + ', farthest index: ' + str(farthest_idx))
         if (self.stopline_wp_idx == -1) or self.stopline_wp_idx >=farthest_idx :
             lane.waypoints = base_waypoints
         else :
@@ -151,13 +151,13 @@ class WaypointUpdater(object):
         for i,wp in enumerate(waypoints) :
             p = Waypoint()
             p.pose = wp.pose
-            stop_idx = min(self.stopline_wp_idx-closest_idx -2,0)
+            stop_idx = max(self.stopline_wp_idx-closest_idx -2,0)
             dist = self.distance(waypoints,i,stop_idx)
 
             vel = math.sqrt(2*MAX_DECEL*dist) # todo: experiment with linear and derivative-functions
             if vel < 1.0:
                 vel = 0.0
-            p.twist.twist.linear.x = min(vel, p.twist.twist.linear.x)
+            p.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
             temp.append(p)
         return temp
 

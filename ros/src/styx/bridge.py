@@ -184,7 +184,7 @@ class Bridge(object):
         #self.publishers['image'].publish(image_message)
         # change suggested by slack user @ericlavigne
         # in order to slow down the incomming images
-        if random.uniform(0,1) < 0.1:
+        if random.uniform(0,1) < 0.4:
             imgString = data["image"]
             image = PIL_Image.open(BytesIO(base64.b64decode(imgString)))
             image_array = np.asarray(image)
