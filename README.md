@@ -2,15 +2,21 @@
 
 This is my individual submission to the _Capstone Project_. I want to get an all around general knowledge on the subject, so I did the project on my own. 
 
+The submitter: Alper Kucukkomurler (Udacity e-mail: kucukkomurler.alper@gmail.com)
+
 ## Result
 
 The car is able to navigate in the simulation track and successfully detect and stop at traffic lights.
-![The video showing the results of the algorithm](https://img.youtube.com/vi/prIGJmnVdkM/0.jpg)](https://youtu.be/prIGJmnVdkM)
+![[The video showing the results of the algorithm](https://img.youtube.com/vi/prIGJmnVdkM/0.jpg)](https://youtu.be/prIGJmnVdkM)
 (Clicking on the image will take you to the youtube video.)
 
 ## How to Use the Code
 
-To test the code you need to download the [frozen trained models](TODO:insert google drive link here!) and extract them into "ros/src/tl_detector/light_classification/" directory.
+If you downloaded this repository from the udacity submission zip file. You can run the code directly by running
+    cd ros
+    roslaunch launch/styx.launch
+
+If you cloned this repository, to test the code you need to download the [frozen trained models](TODO:insert google drive link here!) and extract them into "ros/src/tl_detector/light_classification/" directory. After that step 
 
 ## Traffic Light Detection and Recognition
 
@@ -22,10 +28,43 @@ Object detection requires data for training the models. Luckyily formet Self Dri
 
 There are many approaches to object detection and deep learning. Tensorflor [model Zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) has an up-to-date repository of the state of the art object detection networks. The networks have different complexities (which affects the inference time) and they result in different precisions for object detection. For the traffic light detection I began with the fastest network using _SSD_ and _mobilenets_. However its precision was not enough so I switched a relatively more precise but still fast network using _faster RCNN_ and _inception_v2_ models. 
 
+I trained (more appropriately, fine tuned) two models for simulation and real world data. The model trained with simumation data is located in "ros/src/tl_detector/light_classification/trained/sim/frozen" directory, and the model trained with real world data is located in "ros/src/tl_detector/light_classification/trained/real/frozen". The ros module reads the "is_site" parameter from "/traffic_light_config" and selects the correct model for the _simulation_ or _real world_ configurations. 
+
+Some of the results of inference with the simulation object detector is below. 
+![simulation_detection_result1](detection_results/sim/1.png)
+![simulation_detection_result2](detection_results/sim/2.png)
+![simulation_detection_result3](detection_results/sim/3.png)
+![simulation_detection_result4](detection_results/sim/4.png)
+![simulation_detection_result5](detection_results/sim/5.png)
+![simulation_detection_result6](detection_results/sim/6.png)
+![simulation_detection_result7](detection_results/sim/7.png)
+![simulation_detection_result8](detection_results/sim/8.png)
+
+Some of the results of inference with the real world object detector is below. 
+![real_world_detection_result1](detection_results/real/1.png)
+![real_world_detection_result2](detection_results/real/2.png)
+![real_world_detection_result3](detection_results/real/3.png)
+![real_world_detection_result4](detection_results/real/4.png)
+![real_world_detection_result5](detection_results/real/5.png)
+![real_world_detection_result6](detection_results/real/6.png)
+![real_world_detection_result7](detection_results/real/7.png)
+![real_world_detection_result8](detection_results/real/8.png)
+
+The training data of the simulation dataset has a bias toward red lights, when the light is distant. So the object detector classifies the distant traffic light as red. Although it does not affect the performance of the system greatly, since the car does't slow down much, when it is distant from the light, it slows down the car a bit. There is a room for improvement here. In the future updates I will extend the dataset and increase the performance of the classifier.
+
 ## Waypoint Updater
+
+The waypoint updater reads the topics "/base_waypoints" and "/current_pose" considers the traffic conditions and publishes the waypoints to be followed by the car to "/final_waypoins topic". Waypoint updater is also notified, by the traffic light detection module, about the status of the incomming traffic light.
+
+At each step, the car selects a number of waypoints beginning from the current position of the car and publishes those waypoints. For most of the part, the car follows the lane using the base waypoints. When the car encounters a traffic light, the waypoint updater calculates the location of the nearest traffic light and the stopping line before the light. Waypoint updater alters the forward waypoints in order to stop at the line before the traffic light.
+
+For most of the code I followed the approach outlined by the walktroughs in the class. But there is room for improvement by obstacle avoidance by path planning.
 
 ## Drive by Wire
 
+For the drive by wire module I took the approach outlined by the walktrough as well. This module builds on the path from the waypoint updater.The module has two controller components, one for steering and one for throttle. The steering is a linear model and throttle uses a PID controller.
+
+This model also has room for improvement. It produces oscillations because of the PID type control. It can also be more optimized. I didn't have enough time to implement and tune a model predictive controller for the initial submission. In the next Updates I'm planning to use a model predictive controller that will greatly improve the performance.
 
 
 ### Rest of this file is the original README file from Udacity
