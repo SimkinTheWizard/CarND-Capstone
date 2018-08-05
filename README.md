@@ -9,6 +9,7 @@ The submitter: Alper Kucukkomurler (Udacity e-mail: kucukkomurler.alper@gmail.co
 The car is able to navigate in the simulation track and successfully detect and stop at traffic lights.
 
 [![The video showing the results of the algorithm](https://img.youtube.com/vi/prIGJmnVdkM/0.jpg)](https://youtu.be/prIGJmnVdkM)
+
 (Clicking on the image will take you to the youtube video.)
 
 
