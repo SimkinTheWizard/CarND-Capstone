@@ -19,7 +19,7 @@ If you downloaded this repository from the udacity submission zip file. You can 
     cd ros
     roslaunch launch/styx.launch
 
-If you cloned this repository, to test the code you need to download the [frozen trained models](TODO:insert google drive link here!) and extract them into "ros/src/tl_detector/light_classification/" directory. After that step 
+If you cloned this repository, to test the code you need to download the [frozen trained models](https://drive.google.com/open?id=15gaezf9piXbbTsSr23Dw0McH6wAuvt7z) and extract them into "ros/src/tl_detector/light_classification/" directory. After that step 
 
 Note: the light detection models are compiled against tensorflow 1.9.0. If you are getting _Not Found_ exceptions you might need to freeze the graphs from the latest ckeckpoints from the relative "training" directories.
 
