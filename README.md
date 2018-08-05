@@ -21,6 +21,8 @@ If you downloaded this repository from the udacity submission zip file. You can 
 
 If you cloned this repository, to test the code you need to download the [frozen trained models](TODO:insert google drive link here!) and extract them into "ros/src/tl_detector/light_classification/" directory. After that step 
 
+Note: the light detection models are compiled against tensorflow 1.9.0. If you are getting _Not Found_ exceptions you might need to freeze the graphs from the latest ckeckpoints from the relative "training" directories.
+
 ## Traffic Light Detection and Recognition
 
 For traffic light detection I choose an object detection with deep learning approach. Object detection networks have two parts, one for locating the objects of the image and one for classification of the located objects. The network can both locate the traffic light and classify its color in one step. So using the object detection networks elminiate the need for explicitly locating and classifying the traffic lights.
