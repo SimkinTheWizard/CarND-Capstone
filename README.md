@@ -1,3 +1,35 @@
+# Udacity Self Driving Car Nanodegree - Capstone Project
+
+This is my individual submission to the _Capstone Project_. I want to get an all around general knowledge on the subject, so I did the project on my own. 
+
+## Result
+
+The car is able to navigate in the simulation track and successfully detect and stop at traffic lights.
+![The video showing the results of the algorithm](https://img.youtube.com/vi/prIGJmnVdkM/0.jpg)](https://youtu.be/prIGJmnVdkM)
+(Clicking on the image will take you to the youtube video.)
+
+## How to Use the Code
+
+To test the code you need to download the [frozen trained models](TODO:insert google drive link here!) and extract them into "ros/src/tl_detector/light_classification/" directory.
+
+## Traffic Light Detection and Recognition
+
+For traffic light detection I choose an object detection with deep learning approach. Object detection networks have two parts, one for locating the objects of the image and one for classification of the located objects. The network can both locate the traffic light and classify its color in one step. So using the object detection networks elminiate the need for explicitly locating and classifying the traffic lights.
+
+I used the Tensorflow's [Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection). The object detection API has a [_Model Zoo_](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) where they have the state of the art, pre-trained object detection models.
+
+Object detection requires data for training the models. Luckyily formet Self Driving Car Nanodegree students [Vatsal Srivastava](https://becominghuman.ai/@Vatsal410) and [Daniel Stang](https://medium.com/@WuStangDan) shared their datasets of [simulation] (https://github.com/coldKnight/TrafficLight_Detection-TensorFlowAPI) and real world (https://medium.com/@WuStangDan/step-by-step-tensorflow-object-detection-api-tutorial-part-2-converting-dataset-to-tfrecord-47f24be9248d) datasets.
+
+There are many approaches to object detection and deep learning. Tensorflor [model Zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) has an up-to-date repository of the state of the art object detection networks. The networks have different complexities (which affects the inference time) and they result in different precisions for object detection. For the traffic light detection I began with the fastest network using _SSD_ and _mobilenets_. However its precision was not enough so I switched a relatively more precise but still fast network using _faster RCNN_ and _inception_v2_ models. 
+
+## Waypoint Updater
+
+## Drive by Wire
+
+
+
+### Rest of this file is the original README file from Udacity
+
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
 Please use **one** of the two installation options, either native **or** docker installation.
