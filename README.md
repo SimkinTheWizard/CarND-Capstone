@@ -7,8 +7,10 @@ The submitter: Alper Kucukkomurler (Udacity e-mail: kucukkomurler.alper@gmail.co
 ## Result
 
 The car is able to navigate in the simulation track and successfully detect and stop at traffic lights.
-![[The video showing the results of the algorithm](https://img.youtube.com/vi/prIGJmnVdkM/0.jpg)](https://youtu.be/prIGJmnVdkM)
+
+[![The video showing the results of the algorithm](https://img.youtube.com/vi/prIGJmnVdkM/0.jpg)](https://youtu.be/prIGJmnVdkM)
 (Clicking on the image will take you to the youtube video.)
+
 
 ## How to Use the Code
 
@@ -30,7 +32,8 @@ There are many approaches to object detection and deep learning. Tensorflor [mod
 
 I trained (more appropriately, fine tuned) two models for simulation and real world data. The model trained with simumation data is located in "ros/src/tl_detector/light_classification/trained/sim/frozen" directory, and the model trained with real world data is located in "ros/src/tl_detector/light_classification/trained/real/frozen". The ros module reads the "is_site" parameter from "/traffic_light_config" and selects the correct model for the _simulation_ or _real world_ configurations. 
 
-Some of the results of inference with the simulation object detector is below. 
+Some of the results of inference with the simulation object detector is below.
+
 ![simulation_detection_result1](detection_results/sim/1.png)
 ![simulation_detection_result2](detection_results/sim/2.png)
 ![simulation_detection_result3](detection_results/sim/3.png)
@@ -41,6 +44,7 @@ Some of the results of inference with the simulation object detector is below.
 ![simulation_detection_result8](detection_results/sim/8.png)
 
 Some of the results of inference with the real world object detector is below. 
+
 ![real_world_detection_result1](detection_results/real/1.png)
 ![real_world_detection_result2](detection_results/real/2.png)
 ![real_world_detection_result3](detection_results/real/3.png)
